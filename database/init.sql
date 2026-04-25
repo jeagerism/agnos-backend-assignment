@@ -59,8 +59,8 @@ CREATE INDEX idx_patients_hospital ON patients(hospital);
 -- ==========================================
 -- password is 'password123' that has been hashed (Bcrypt)
 INSERT INTO staffs (username, password, hospital) VALUES 
-('staff_a', '$2a$10$vI8aWBnW3fID.ZQ4/zo1G.q1lRps.9cGLcZEiGDMVr5yUP1KUOYTa', 'Hospital A'),
-('staff_b', '$2a$10$vI8aWBnW3fID.ZQ4/zo1G.q1lRps.9cGLcZEiGDMVr5yUP1KUOYTa', 'Hospital B')
+('staff_a', '$2a$10$NcTGHE6lygcBVp8mDPpXvOKBvacjklSIAxgjQrFI6fR7hcC2tSskS', 'Hospital A'),
+('staff_b', '$2a$10$NcTGHE6lygcBVp8mDPpXvOKBvacjklSIAxgjQrFI6fR7hcC2tSskS', 'Hospital B')
 ON CONFLICT DO NOTHING;
 
 INSERT INTO patients (hospital, patient_hn, national_id, passport_id, first_name_th, last_name_th, date_of_birth, gender) VALUES
