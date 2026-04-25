@@ -12,7 +12,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// sentinel errors สำหรับแยกประเภทความผิดพลาดใน service layer
+// sentinel errors for service layer
 var (
 	ErrUserNotFound  = errors.New("user not found")
 	ErrWrongPassword = errors.New("wrong password")

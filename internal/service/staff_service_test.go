@@ -12,8 +12,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// mockStaffRepo จำลอง repository.StaffRepository โดยไม่ต้องเชื่อมต่อ DB จริง
-// แต่ละ field เป็น function ที่เราสามารถกำหนดพฤติกรรมได้ในแต่ละ test case
+// mockStaffRepo mock repository.StaffRepository without connecting to the real DB
+// each field is a function that we can define the behavior in each test case
 type mockStaffRepo struct {
 	createFn         func(ctx context.Context, s *model.Staff) error
 	findByUsernameFn func(ctx context.Context, username string) (*model.Staff, error)
@@ -43,9 +43,9 @@ func TestCreate(t *testing.T) {
 			setupRepo: func() *mockStaffRepo {
 				return &mockStaffRepo{
 					createFn: func(ctx context.Context, s *model.Staff) error {
-						// ตรวจสอบว่า password ถูก hash แล้ว (ไม่ใช่ plain text)
+						// check if password is hashed (not plain text)
 						assert.NotEqual(t, "password123", s.Password)
-						// ตรวจสอบว่า hash นั้น verify กับ plain text ได้
+						// check if hash can be verified with plain text
 						err := bcrypt.CompareHashAndPassword([]byte(s.Password), []byte("password123"))
 						assert.NoError(t, err)
 						return nil
@@ -99,7 +99,7 @@ func TestLogin(t *testing.T) {
 			setupRepo: func() *mockStaffRepo {
 				return &mockStaffRepo{
 					findByUsernameFn: func(ctx context.Context, username string) (*model.Staff, error) {
-						// จำลอง staff ที่มีอยู่ใน DB พร้อม hashed password
+						// mock staff with hashed password
 						return &model.Staff{Username: username, Password: string(hashed), Hospital: "Hospital A"}, nil
 					},
 				}
@@ -119,7 +119,7 @@ func TestLogin(t *testing.T) {
 			},
 			req:      request.LoginStaffRequest{Username: "staff_a", Password: "wrongpassword"},
 			wantToken: false,
-			// service คืน ErrWrongPassword → handler map เป็น "invalid credentials" ก่อน response
+			// service returns ErrWrongPassword → handler maps this to "invalid credentials" before response
 			wantErr: service.ErrWrongPassword,
 		},
 		{
@@ -133,8 +133,8 @@ func TestLogin(t *testing.T) {
 			},
 			req:      request.LoginStaffRequest{Username: "unknown_user", Password: "password123"},
 			wantToken: false,
-			// service คืน ErrUserNotFound → handler map เป็น "invalid credentials" ก่อน response
-			// ทำให้ client ไม่รู้ว่า username มีอยู่จริงหรือไม่ (ป้องกัน username enumeration)
+			// service returns ErrUserNotFound → handler maps this to "invalid credentials" before response
+			// to prevent username enumeration
 			wantErr: service.ErrUserNotFound,
 		},
 	}

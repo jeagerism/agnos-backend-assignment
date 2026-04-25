@@ -44,9 +44,9 @@ func (h *StaffHandler) Login(c *gin.Context) {
 
 	token, err := h.service.Login(c.Request.Context(), req)
 	if err != nil {
-		// log จริงเพื่อให้รู้ว่าพลาดจุดไหน (server side เท่านั้น)
+		// log real error to know where it failed (server side only)	
 		log.Printf("[login] failed for user %q: %v", req.Username, err)
-		// response ออกไปเป็น generic เพื่อป้องกัน username enumeration
+		// response out as generic to prevent username enumeration
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 		return
 	}
