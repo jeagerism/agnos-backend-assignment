@@ -23,12 +23,12 @@ type Patient struct {
 	MiddleNameEN *string   `json:"middle_name_en"`
 	LastNameEN   *string   `json:"last_name_en"`
 	
-	DateOfBirth  *time.Time `gorm:"type:date" json:"date_of_birth"`
+	DateOfBirth  time.Time `gorm:"type:date;not null" json:"date_of_birth"`
 	
 	PhoneNumber  *string   `json:"phone_number"`
 	Email        *string   `json:"email"`
 	
-	Gender       string    `gorm:"not null" json:"gender"` // M, F (mandatory)
+	Gender       string    `gorm:"not null;check:gender IN ('M','F')" json:"gender"` // M, F (mandatory)
 	
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
