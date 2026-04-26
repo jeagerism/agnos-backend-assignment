@@ -48,6 +48,20 @@ func (h *PatientHandler) Search(c *gin.Context) {
 	})
 }
 
+
+func (h *PatientHandler) GetPatientByID(c *gin.Context) {
+	id := c.Param("id")
+	patient, err := h.service.GetPatientByID(c.Request.Context(), id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, response.GetPatientByIDResponse{
+		Message: "patient retrieved successfully",
+		Data:    patient,
+	})
+}
 func buildPaginate(page, limit int, total int64) response.PaginateResponse {
 	return response.PaginateResponse{
 		Page:    page,

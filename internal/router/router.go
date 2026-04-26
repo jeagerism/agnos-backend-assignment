@@ -16,8 +16,13 @@ func SetupRouter(staffHandler *handler.StaffHandler, patientHandler *handler.Pat
 	}
 
 	patientGroup := r.Group("/patient")
-	patientGroup.Use(middleware.Auth(jwtSecret))
-	patientGroup.GET("/search", patientHandler.Search)
+	{
+		patientGroup.GET("search/:id", patientHandler.GetPatientByID)
+		patientGroup.Use(middleware.Auth(jwtSecret))
+		{
+			patientGroup.GET("search", patientHandler.Search)
+		}
+	}
 
 	return r
 }

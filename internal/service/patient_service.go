@@ -11,6 +11,7 @@ import (
 
 type PatientService interface {
 	Search(ctx context.Context, req request.SearchPatientRequest) ([]response.PatientResponse, int64, error)
+	GetPatientByID(ctx context.Context, hn string) (response.PatientResponse, error)
 }
 
 type patientService struct {
@@ -68,3 +69,30 @@ func toPatientResponses(patients []model.Patient) []response.PatientResponse {
 	return result
 }
 
+func (s *patientService) GetPatientByID(ctx context.Context, id string) (response response.PatientResponse, err error) {
+	patient, err := s.repo.GetPatientByID(ctx, id)
+	if err != nil {
+		return response, err
+	}
+	return toPatientResponse(patient), nil
+}
+
+func toPatientResponse(patient model.Patient) response.PatientResponse {
+	return response.PatientResponse{
+		ID:           patient.ID,
+		Hospital:     patient.Hospital,
+		PatientHN:    patient.PatientHN,
+		NationalID:   patient.NationalID,
+		PassportID:   patient.PassportID,
+		FirstNameTH:  patient.FirstNameTH,
+		MiddleNameTH: patient.MiddleNameTH,
+		LastNameTH:   patient.LastNameTH,
+		FirstNameEN:  patient.FirstNameEN,
+		MiddleNameEN: patient.MiddleNameEN,
+		LastNameEN:   patient.LastNameEN,
+		DateOfBirth:  patient.DateOfBirth,
+		PhoneNumber:  patient.PhoneNumber,
+		Email:        patient.Email,
+		Gender:       patient.Gender,
+	}
+}

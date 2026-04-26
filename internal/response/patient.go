@@ -35,3 +35,9 @@ type PatientResponse struct {
 	Email        *string   `json:"email"`
 	Gender       string    `json:"gender"`
 }
+
+
+type GetPatientByIDResponse struct {
+	Message string         `json:"message"`
+	Data    PatientResponse `json:"data"`
+}

@@ -34,6 +34,7 @@ type PatientSearchFilter struct {
 
 type PatientRepository interface {
 	Search(ctx context.Context, filter PatientSearchFilter) ([]model.Patient, int64, error)
+	GetPatientByID(ctx context.Context, id string) (model.Patient, error)
 }
 
 type patientRepository struct {
@@ -42,6 +43,13 @@ type patientRepository struct {
 
 func NewPatientRepository(db *gorm.DB) PatientRepository {
 	return &patientRepository{db: db}
+}
+
+func (r *patientRepository) GetPatientByID(ctx context.Context, id string) (response model.Patient,err error) {
+	if err := r.db.WithContext(ctx).Where("national_id = ? OR passport_id = ?", id, id).First(&response).Error; err != nil {
+		return response, err
+	}
+	return response, nil
 }
 
 func (r *patientRepository) Search(ctx context.Context, filter PatientSearchFilter) ([]model.Patient, int64, error) {
