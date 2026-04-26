@@ -17,6 +17,11 @@ func main() {
 	staffSvc := service.NewStaffService(staffRepo, cfg.JWTSecret)
 	staffHandler := handler.NewStaffHandler(staffSvc)
 
-	r := router.SetupRouter(staffHandler)
-	r.Run(":" + cfg.AppPort)
+	patientRepo := repository.NewPatientRepository(database.DB)
+	patientSvc := service.NewPatientService(patientRepo)
+	patientHandler := handler.NewPatientHandler(patientSvc)
+
+	r := router.SetupRouter(staffHandler, patientHandler, cfg.JWTSecret)
+
+	r.Run(":" + cfg.AppPort)	
 }
