@@ -1,0 +1,8 @@
+.git
+.gitignore
+.cursor
+tmp
+bin
+dist
+coverage.out
+*.log
