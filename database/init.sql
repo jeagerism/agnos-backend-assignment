@@ -63,11 +63,88 @@ INSERT INTO staffs (username, password, hospital) VALUES
 ('staff_b', '$2a$10$NcTGHE6lygcBVp8mDPpXvOKBvacjklSIAxgjQrFI6fR7hcC2tSskS', 'Hospital B')
 ON CONFLICT DO NOTHING;
 
-INSERT INTO patients (hospital, patient_hn, national_id, passport_id, first_name_th, last_name_th, date_of_birth, gender) VALUES
-('Hospital A', 'HN001', '1111111111111', NULL,         'สมชาย', 'ใจดี', '1990-05-15', 'M'),
-('Hospital A', 'HN002', NULL,            'P88888888',  'สมศรี', 'มีสุข', '1992-08-01', 'F')
-ON CONFLICT DO NOTHING;
-
-INSERT INTO patients (hospital, patient_hn, passport_id, first_name_th, last_name_th, first_name_en, last_name_en, date_of_birth, gender) VALUES
-('Hospital B', 'HN001', 'P12345678', 'จอห์น', 'ดีแลน', 'John', 'Dylan', '1985-11-20', 'M')
+WITH seed AS (
+    SELECT
+        gs AS seq,
+        CASE WHEN gs <= 50 THEN 'Hospital A' ELSE 'Hospital B' END AS hospital,
+        CASE WHEN gs <= 50 THEN gs ELSE gs - 50 END AS hn_seq
+    FROM generate_series(1, 100) AS gs
+)
+INSERT INTO patients (
+    hospital,
+    patient_hn,
+    national_id,
+    passport_id,
+    first_name_th,
+    middle_name_th,
+    last_name_th,
+    first_name_en,
+    middle_name_en,
+    last_name_en,
+    date_of_birth,
+    phone_number,
+    email,
+    gender
+)
+SELECT
+    s.hospital,
+    'HN' || LPAD(s.hn_seq::text, 3, '0') AS patient_hn,
+    CASE
+        WHEN s.seq % 3 IN (0, 1) THEN LPAD((1000000000000 + s.seq)::text, 13, '0')
+        ELSE NULL
+    END AS national_id,
+    CASE
+        WHEN s.seq % 3 IN (0, 2) THEN 'P' || LPAD((88000000 + s.seq)::text, 8, '0')
+        ELSE NULL
+    END AS passport_id,
+    CASE (s.seq % 8)
+        WHEN 0 THEN 'สมชาย'
+        WHEN 1 THEN 'สมศรี'
+        WHEN 2 THEN 'อนันต์'
+        WHEN 3 THEN 'สุรีย์'
+        WHEN 4 THEN 'ธนา'
+        WHEN 5 THEN 'กานต์'
+        WHEN 6 THEN 'ปิยะ'
+        ELSE 'ศิริพร'
+    END AS first_name_th,
+    CASE
+        WHEN s.seq % 4 = 0 THEN 'กลาง'
+        ELSE NULL
+    END AS middle_name_th,
+    CASE (s.seq % 8)
+        WHEN 0 THEN 'ใจดี'
+        WHEN 1 THEN 'มีสุข'
+        WHEN 2 THEN 'แซ่ลิ้ม'
+        WHEN 3 THEN 'ทองคำ'
+        WHEN 4 THEN 'ศรีสุข'
+        WHEN 5 THEN 'พูนทรัพย์'
+        WHEN 6 THEN 'บุญมา'
+        ELSE 'พงษ์ดี'
+    END AS last_name_th,
+    CASE
+        WHEN s.seq % 2 = 0 THEN 'Name' || s.seq::text
+        ELSE NULL
+    END AS first_name_en,
+    CASE
+        WHEN s.seq % 10 = 0 THEN 'Mid' || s.seq::text
+        ELSE NULL
+    END AS middle_name_en,
+    CASE
+        WHEN s.seq % 2 = 0 THEN 'Surname' || s.seq::text
+        ELSE NULL
+    END AS last_name_en,
+    DATE '1980-01-01' + ((s.seq * 37) % 12000) AS date_of_birth,
+    CASE
+        WHEN s.seq % 5 = 0 THEN NULL
+        ELSE '08' || LPAD((10000000 + s.seq)::text, 8, '0')
+    END AS phone_number,
+    CASE
+        WHEN s.seq % 6 = 0 THEN NULL
+        ELSE 'patient' || s.seq::text || '@example.com'
+    END AS email,
+    CASE
+        WHEN s.seq % 2 = 0 THEN 'F'
+        ELSE 'M'
+    END AS gender
+FROM seed AS s
 ON CONFLICT DO NOTHING;
